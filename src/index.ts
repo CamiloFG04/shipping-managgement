@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
-import { AppRoutes } from "./presentation/routes";
-import { Server } from "./presentation/server";
-import { PostgreSQLDatabase } from "./data/postgresql/postgreSql-database";
 import { envs } from "./config/envs";
+import { Server } from "./presentation/server";
+import { AppRoutes } from "./presentation/routes";
+import { PostgreSQLDatabase } from "./data/postgresql/postgreSql-database";
 
 (() => {
     main();
