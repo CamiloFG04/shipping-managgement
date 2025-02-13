@@ -4,6 +4,7 @@ import { RegisterDto } from "../../domain/dtos/auth/register.dto";
 import { UserEntity } from "../../domain/entities/user.entity";
 import { CustomError } from "../../domain/errors/custom.error";
 import { BcryptAdapter } from "../../config/bcryp";
+import { UserMapper } from "../mappers/user.mapper";
 
 export class AuthDataSourceImpl implements AuthDataSource {
     constructor(private readonly pool: Pool) {}
@@ -26,15 +27,7 @@ export class AuthDataSourceImpl implements AuthDataSource {
                 [name, email, hashPass, phone, identification, "user"]
             );
 
-            return new UserEntity(
-                1,
-                name,
-                email,
-                hashPass,
-                phone,
-                identification,
-                "user"
-            );
+            return UserMapper.userEntityFromObject(newUser.rows[0]);
         } catch (error) {
             console.log(error);
 
