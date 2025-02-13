@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { RegisterDto } from "../../domain/dtos/auth/register.dto";
 import { AuthRepository } from "../../domain/repositories/auth.repository";
 import { CustomError } from "../../domain/errors/custom.error";
+import { LoginDto } from "../../domain/dtos/auth/login.dto";
+import { RegisterUser } from "../../domain/use-cases/auth/register-user.use-case";
+import { LoginUser } from "../../domain/use-cases/auth/login-user.use-case";
 
 export class AutController {
     constructor(private readonly authRepository: AuthRepository) {}
@@ -25,13 +28,27 @@ export class AutController {
             res.status(400).json({ success: false, error });
             return;
         }
-        this.authRepository
-            .register(registerDto!)
-            .then((user) => res.status(200).json({ success: true, user }))
+
+        new RegisterUser(this.authRepository)
+            .execute(registerDto)
+            .then((user) => {
+                res.status(201).json({ success: true, user });
+            })
             .catch((error) => this.handleError(error, res));
     };
 
     loginUser = (req: Request, res: Response) => {
-        res.json("loginUser controller");
+        const [error, loginDto] = LoginDto.create(req.body);
+        if (error) {
+            res.status(400).json({ success: false, error });
+            return;
+        }
+
+        new LoginUser(this.authRepository)
+            .execute(loginDto)
+            .then((token) => {
+                res.status(201).json({ success: true, token });
+            })
+            .catch((error) => this.handleError(error, res));
     };
 }

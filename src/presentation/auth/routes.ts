@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AutController } from "./controller";
-import { AuthRepositoryImpl } from "../../infrastructure/repositories/aut.repository.impl";
+import { AuthRepositoryImpl } from "../../infrastructure/repositories/auth.repository.impl";
 import { AuthDataSourceImpl } from "../../infrastructure/datasources/auth.datasource.impl";
 import { PostgreSQLDatabase } from "../../data/postgresql/postgreSql-database";
 
