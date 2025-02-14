@@ -14,4 +14,5 @@ export const envs = {
     ).asString(),
 
     JWT_SECRET: get("JWT_SECRET").required().asString(),
+    GOOGLE_MAPS_KEY: get("GOOGLE_MAPS_KEY").required().asString(),
 };

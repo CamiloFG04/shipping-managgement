@@ -27,7 +27,10 @@ export class AuthMiddleware {
             }
 
             if (!authorization.startsWith("Bearer ")) {
-                res.status(401).json({ error: "Invalid Bearer token" });
+                res.status(401).json({
+                    success: false,
+                    error: "Invalid Bearer token",
+                });
                 return;
             }
 
@@ -36,7 +39,10 @@ export class AuthMiddleware {
                 const payload = await JwtAdapter.validateToken<T>(token);
 
                 if (!payload) {
-                    res.status(401).json({ error: "Invalid token" });
+                    res.status(401).json({
+                        success: false,
+                        error: "Invalid token",
+                    });
                     return;
                 }
                 const user = await pool.query(
@@ -45,6 +51,7 @@ export class AuthMiddleware {
                 );
                 if (user.rowCount == 0) {
                     res.status(401).json({
+                        success: false,
                         error: "Invalid token - user not found",
                     });
                     return;
@@ -53,7 +60,10 @@ export class AuthMiddleware {
                 req.user = user.rows[0];
                 next();
             } catch (error) {
-                res.status(500).json({ error: "Internal server error" });
+                res.status(500).json({
+                    success: false,
+                    error: "Internal server error",
+                });
                 return;
             }
         };
