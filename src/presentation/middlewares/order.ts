@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Pool } from "pg";
 import { OrderEntity } from "../../domain/entities/order.entity";
+import { RedisAdapter } from "../../config/redis";
 
 declare global {
     namespace Express {
@@ -47,10 +48,31 @@ export class OrderMiddleware {
             const { tracking_code } = req.query;
 
             try {
+                const client = RedisAdapter.getClient();
+                if (!client) {
+                    console.warn(
+                        "⚠️ Redis is not available. It will continue without cache."
+                    );
+                } else {
+                    const replay = await client.get("order");
+                    if (replay) {
+                        req.order = JSON.parse(replay);
+                        next();
+                        return;
+                    }
+                }
+
                 const order = await pool.query(
                     "SELECT * FROM orders WHERE tracking_code = $1",
                     [tracking_code]
                 );
+                if (client) {
+                    await client.setEx(
+                        "order",
+                        120,
+                        JSON.stringify(order.rows[0])
+                    );
+                }
 
                 if (order.rowCount == 0) {
                     res.status(404).json({
@@ -63,6 +85,8 @@ export class OrderMiddleware {
                 req.order = order.rows[0];
                 next();
             } catch (error) {
+                console.log(error);
+
                 res.status(500).json({
                     success: false,
                     error: "Internal server error",

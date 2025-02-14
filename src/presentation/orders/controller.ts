@@ -52,15 +52,13 @@ export class OrderController {
         new AssignOrder(this.orderRepository)
             .execute(orderAssignDto)
             .then((order) => {
-                res.status(201).json({ success: true, order });
+                res.status(200).json({ success: true, order });
             })
             .catch((error) => this.handleError(error, res));
     };
 
     getOrderDetail = (req: Request, res: Response) => {
         const { tracking_code } = req.query;
-
-        console.log(tracking_code);
 
         const [error, orderDetailDto] = OrderDetailDto.create({
             tracking_code,
@@ -74,7 +72,7 @@ export class OrderController {
         new OrderDetail(this.orderRepository)
             .execute(orderDetailDto)
             .then((order) => {
-                res.status(201).json({ success: true, order });
+                res.status(200).json({ success: true, order });
             })
             .catch((error) => this.handleError(error, res));
     };

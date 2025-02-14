@@ -12,8 +12,6 @@ export class TransporterMiddleware {
                     [transporter_id]
                 );
 
-                console.log(transporter.rows[0]);
-
                 if (transporter.rowCount == 0) {
                     res.status(404).json({
                         success: false,

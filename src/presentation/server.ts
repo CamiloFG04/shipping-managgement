@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import { RedisAdapter } from "../config/redis";
 
 interface Options {
     port?: number;
@@ -17,6 +18,7 @@ export class Server {
     }
 
     async start() {
+        await RedisAdapter.connect();
         this.app.use(express.json());
         this.app.use(this.routes);
         this.app.listen(this.port, () => {

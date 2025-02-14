@@ -8,6 +8,7 @@ import { TrackingCode } from "../../config/tranckingCode";
 import { OrderAssignDto } from "../../domain/dtos/orders/orderAssign.dto";
 import { OrderDetailDto } from "../../domain/dtos/orders/orderDetail.dto";
 import { OrderDetailEntity } from "../../domain/entities/orderDetail.entity";
+import { RedisAdapter } from "../../config/redis";
 
 export class OrderDataSourceImpl implements OrderDataSource {
     constructor(private readonly pool: Pool) {}
@@ -63,10 +64,18 @@ export class OrderDataSourceImpl implements OrderDataSource {
     async update(orderAssignDto: OrderAssignDto): Promise<OrderEntity> {
         const { id, transporter_id } = orderAssignDto;
         try {
+            const client = RedisAdapter.getClient();
             const order = await this.pool.query(
                 `UPDATE orders SET status = $1, transporter_id = $2, assigned_at = NOW() WHERE id = $3 RETURNING *`,
                 ["In transit", transporter_id, id]
             );
+
+            await this.pool.query(
+                `UPDATE transporters SET available = false where id = $1`,
+                [transporter_id]
+            );
+
+            await client.del("orderDetail");
 
             return OrderMapper.orderEntityFromObject(order.rows[0]);
         } catch (error) {
@@ -85,6 +94,21 @@ export class OrderDataSourceImpl implements OrderDataSource {
         const { tracking_code } = orderDetailDto;
 
         try {
+            const client = RedisAdapter.getClient();
+
+            if (!client) {
+                console.warn(
+                    "⚠️ Redis is not available. It will continue without cache."
+                );
+            } else {
+                const replay = await client.get("orderDetail");
+                if (replay) {
+                    return OrderMapper.orderEntityDetailFromObject(
+                        JSON.parse(replay)
+                    );
+                }
+            }
+
             const order = await this.pool.query(
                 `SELECT ord.tracking_code, 
                         ord.package_weight, 
@@ -110,8 +134,18 @@ export class OrderDataSourceImpl implements OrderDataSource {
                 [tracking_code]
             );
 
+            if (client) {
+                await client.setEx(
+                    "orderDetail",
+                    120,
+                    JSON.stringify(order.rows[0])
+                );
+            }
+
             return OrderMapper.orderEntityDetailFromObject(order.rows[0]);
         } catch (error) {
+            console.log(error);
+
             if (error instanceof CustomError) {
                 throw error;
             }
