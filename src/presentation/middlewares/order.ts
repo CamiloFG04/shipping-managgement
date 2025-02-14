@@ -11,11 +11,10 @@ declare global {
 }
 
 export class OrderMiddleware {
-    static validateOrder =
+    static validateOrderByID =
         (pool: Pool) =>
         async (req: Request, res: Response, next: NextFunction) => {
             const { id } = req.params;
-            console.log(id);
 
             try {
                 const order = await pool.query(
@@ -27,6 +26,36 @@ export class OrderMiddleware {
                     res.status(404).json({
                         success: false,
                         error: "order not found",
+                    });
+                    return;
+                }
+
+                req.order = order.rows[0];
+                next();
+            } catch (error) {
+                res.status(500).json({
+                    success: false,
+                    error: "Internal server error",
+                });
+                return;
+            }
+        };
+
+    static validateOrderByTrackingCode =
+        (pool: Pool) =>
+        async (req: Request, res: Response, next: NextFunction) => {
+            const { tracking_code } = req.query;
+
+            try {
+                const order = await pool.query(
+                    "SELECT * FROM orders WHERE tracking_code = $1",
+                    [tracking_code]
+                );
+
+                if (order.rowCount == 0) {
+                    res.status(404).json({
+                        success: false,
+                        error: "The consulted guide was not found",
                     });
                     return;
                 }

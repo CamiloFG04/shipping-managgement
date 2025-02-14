@@ -30,9 +30,16 @@ export class OrderRoutes {
             "/:id/assign-transporter",
             AuthMiddleware.validateToken(pool),
             ValidateAdminRolMiddleware.validateAdminRol,
-            OrderMiddleware.validateOrder(pool),
+            OrderMiddleware.validateOrderByID(pool),
             TransporterMiddleware.validateTransporter(pool),
             controller.update
+        );
+
+        router.get(
+            "/code-tracking/code-tracking-detail",
+            AuthMiddleware.validateToken(pool),
+            OrderMiddleware.validateOrderByTrackingCode(pool),
+            controller.getOrderDetail
         );
 
         return router;

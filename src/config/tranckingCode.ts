@@ -7,6 +7,8 @@ export class TrackingCode {
             .substring(2, 6)
             .toUpperCase();
 
-        return `${prefix}${timestamp}${randomPart}`;
+        const remainingLength = 8;
+        const combinedPart = (timestamp + randomPart).slice(0, remainingLength);
+        return `${prefix}${combinedPart}`;
     }
 }

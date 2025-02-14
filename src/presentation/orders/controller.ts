@@ -5,6 +5,8 @@ import { CreateOrder } from "../../domain/use-cases/orders/create-order.use-case
 import { CustomError } from "../../domain/errors/custom.error";
 import { OrderAssignDto } from "../../domain/dtos/orders/orderAssign.dto";
 import { AssignOrder } from "../../domain/use-cases/orders/assign-order.use-case";
+import { OrderDetail } from "../../domain/use-cases/orders/order-detail.use-case";
+import { OrderDetailDto } from "../../domain/dtos/orders/orderDetail.dto";
 
 export class OrderController {
     constructor(private readonly orderRepository: OrderRepository) {}
@@ -49,6 +51,28 @@ export class OrderController {
 
         new AssignOrder(this.orderRepository)
             .execute(orderAssignDto)
+            .then((order) => {
+                res.status(201).json({ success: true, order });
+            })
+            .catch((error) => this.handleError(error, res));
+    };
+
+    getOrderDetail = (req: Request, res: Response) => {
+        const { tracking_code } = req.query;
+
+        console.log(tracking_code);
+
+        const [error, orderDetailDto] = OrderDetailDto.create({
+            tracking_code,
+        });
+
+        if (error) {
+            res.status(400).json({ success: false, error });
+            return;
+        }
+
+        new OrderDetail(this.orderRepository)
+            .execute(orderDetailDto)
             .then((order) => {
                 res.status(201).json({ success: true, order });
             })
