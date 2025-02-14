@@ -5,6 +5,7 @@ import { OrderEntity } from "../../domain/entities/order.entity";
 import { CustomError } from "../../domain/errors/custom.error";
 import { OrderMapper } from "../mappers/order.mapper";
 import { TrackingCode } from "../../config/tranckingCode";
+import { OrderAssignDto } from "../../domain/dtos/orders/orderAssign.dto";
 
 export class OrderDataSourceImpl implements OrderDataSource {
     constructor(private readonly pool: Pool) {}
@@ -44,6 +45,25 @@ export class OrderDataSourceImpl implements OrderDataSource {
                     recipient_identification,
                     destination_address,
                 ]
+            );
+
+            return OrderMapper.orderEntityFromObject(order.rows[0]);
+        } catch (error) {
+            console.log({ error });
+
+            if (error instanceof CustomError) {
+                throw error;
+            }
+            throw CustomError.internalServerError();
+        }
+    }
+
+    async update(orderAssignDto: OrderAssignDto): Promise<OrderEntity> {
+        const { id, transporter_id } = orderAssignDto;
+        try {
+            const order = await this.pool.query(
+                `UPDATE orders SET status = $1, transporter_id = $2, assigned_at = NOW() WHERE id = $3 RETURNING *`,
+                ["In transit", transporter_id, id]
             );
 
             return OrderMapper.orderEntityFromObject(order.rows[0]);

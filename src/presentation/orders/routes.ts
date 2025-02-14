@@ -6,6 +6,9 @@ import { OrderRepositoryImpl } from "../../infrastructure/repositories/order.rep
 import { AuthMiddleware } from "../middlewares/auth.middleware";
 import { validateAddressesMiddleware } from "../middlewares/address.middleware";
 import { ValidateUserRolMiddleware } from "../middlewares/userRol.middleware";
+import { ValidateAdminRolMiddleware } from "../middlewares/adminRol.middleware";
+import { TransporterMiddleware } from "../middlewares/transporter";
+import { OrderMiddleware } from "../middlewares/order";
 
 export class OrderRoutes {
     static get routes(): Router {
@@ -21,6 +24,15 @@ export class OrderRoutes {
             ValidateUserRolMiddleware.validateUserRol,
             validateAddressesMiddleware.validateToken,
             controller.store
+        );
+
+        router.put(
+            "/:id/assign-transporter",
+            AuthMiddleware.validateToken(pool),
+            ValidateAdminRolMiddleware.validateAdminRol,
+            OrderMiddleware.validateOrder(pool),
+            TransporterMiddleware.validateTransporter(pool),
+            controller.update
         );
 
         return router;
