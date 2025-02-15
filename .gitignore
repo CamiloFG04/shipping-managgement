@@ -5,3 +5,4 @@ dist
 .prettierrc.json
 .prettierignore
 database/
+coverage/
