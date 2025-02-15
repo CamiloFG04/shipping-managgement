@@ -74,8 +74,9 @@ export class OrderDataSourceImpl implements OrderDataSource {
                 `UPDATE transporters SET available = false where id = $1`,
                 [transporter_id]
             );
-
-            await client.del("orderDetail");
+            if (client) {
+                await client.del(`orderDetail:${order.rows[0].tracking_code}`);
+            }
 
             return OrderMapper.orderEntityFromObject(order.rows[0]);
         } catch (error) {
@@ -96,12 +97,8 @@ export class OrderDataSourceImpl implements OrderDataSource {
         try {
             const client = RedisAdapter.getClient();
 
-            if (!client) {
-                console.warn(
-                    "⚠️ Redis is not available. It will continue without cache."
-                );
-            } else {
-                const replay = await client.get("orderDetail");
+            if (client) {
+                const replay = await client.get(`orderDetail:${tracking_code}`);
                 if (replay) {
                     return OrderMapper.orderEntityDetailFromObject(
                         JSON.parse(replay)
@@ -136,7 +133,7 @@ export class OrderDataSourceImpl implements OrderDataSource {
 
             if (client) {
                 await client.setEx(
-                    "orderDetail",
+                    `orderDetail:${tracking_code}`,
                     120,
                     JSON.stringify(order.rows[0])
                 );
@@ -145,6 +142,30 @@ export class OrderDataSourceImpl implements OrderDataSource {
             return OrderMapper.orderEntityDetailFromObject(order.rows[0]);
         } catch (error) {
             console.log(error);
+
+            if (error instanceof CustomError) {
+                throw error;
+            }
+            throw CustomError.internalServerError();
+        }
+    }
+
+    async closeOrder(orderDetailDto: OrderDetailDto): Promise<OrderEntity> {
+        const { tracking_code } = orderDetailDto;
+        try {
+            const order = await this.pool.query(
+                `UPDATE orders SET status = $1, delivery_at = NOW() WHERE tracking_code = $2 RETURNING *`,
+                ["Delivered", tracking_code]
+            );
+
+            await this.pool.query(
+                `UPDATE transporters SET available = true where id = $1`,
+                [order.rows[0].transporter_id]
+            );
+
+            return OrderMapper.orderEntityFromObject(order.rows[0]);
+        } catch (error) {
+            console.log({ error });
 
             if (error instanceof CustomError) {
                 throw error;

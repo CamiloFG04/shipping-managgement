@@ -20,4 +20,8 @@ export class OrderRepositoryImpl implements OrderRepository {
     getOrderDetail(orderDetailDto: OrderDetailDto): Promise<OrderDetailEntity> {
         return this.dataSource.getOrderDetail(orderDetailDto);
     }
+
+    closeOrder(orderDetailDto: OrderDetailDto): Promise<OrderEntity> {
+        return this.dataSource.closeOrder(orderDetailDto);
+    }
 }

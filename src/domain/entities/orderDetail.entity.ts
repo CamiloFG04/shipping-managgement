@@ -14,6 +14,8 @@ export class OrderDetailEntity {
         public user_phone: string,
         public user_identification: string,
         public transporter_name?: string,
-        public transporter_identification?: string
+        public transporter_identification?: string,
+        public assigned_at?: Date,
+        public delivery_at?: Date
     ) {}
 }

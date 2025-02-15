@@ -7,6 +7,7 @@ import { OrderAssignDto } from "../../domain/dtos/orders/orderAssign.dto";
 import { AssignOrder } from "../../domain/use-cases/orders/assign-order.use-case";
 import { OrderDetail } from "../../domain/use-cases/orders/order-detail.use-case";
 import { OrderDetailDto } from "../../domain/dtos/orders/orderDetail.dto";
+import { CloseOrder } from "../../domain/use-cases/orders/close-order.use-case";
 
 export class OrderController {
     constructor(private readonly orderRepository: OrderRepository) {}
@@ -71,6 +72,21 @@ export class OrderController {
 
         new OrderDetail(this.orderRepository)
             .execute(orderDetailDto)
+            .then((order) => {
+                res.status(200).json({ success: true, order });
+            })
+            .catch((error) => this.handleError(error, res));
+    };
+
+    closeOrder = (req: Request, res: Response) => {
+        const [error, orderAssignDto] = OrderDetailDto.create(req.params);
+        if (error) {
+            res.status(400).json({ success: false, error });
+            return;
+        }
+
+        new CloseOrder(this.orderRepository)
+            .execute(orderAssignDto)
             .then((order) => {
                 res.status(200).json({ success: true, order });
             })

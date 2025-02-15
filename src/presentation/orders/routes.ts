@@ -42,6 +42,14 @@ export class OrderRoutes {
             controller.getOrderDetail
         );
 
+        router.put(
+            "/:tracking_code/close-order",
+            AuthMiddleware.validateToken(pool),
+            ValidateAdminRolMiddleware.validateAdminRol,
+            OrderMiddleware.validateCloseOrderByTrackingCode(pool),
+            controller.closeOrder
+        );
+
         return router;
     }
 }

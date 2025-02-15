@@ -81,6 +81,8 @@ export class OrderMapper {
             user_identification,
             transporter_name,
             transporter_identification,
+            assigned_at,
+            delivery_at,
         } = object;
 
         if (!tracking_code)
@@ -124,7 +126,9 @@ export class OrderMapper {
             user_phone,
             user_identification,
             transporter_name,
-            transporter_identification
+            transporter_identification,
+            assigned_at,
+            delivery_at
         );
     }
 }

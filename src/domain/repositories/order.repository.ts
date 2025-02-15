@@ -10,4 +10,5 @@ export abstract class OrderRepository {
     abstract getOrderDetail(
         orderDetailDto: OrderDetailDto
     ): Promise<OrderDetailEntity>;
+    abstract closeOrder(orderDetailDto: OrderDetailDto): Promise<OrderEntity>;
 }

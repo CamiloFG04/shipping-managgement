@@ -1,10 +1,10 @@
-import { RegisterDto } from "../../dtos/auth/register.dto";
-import { OrderDto } from "../../dtos/orders/order.dto";
+import { OrderAssignDto } from "../../dtos/orders/orderAssign.dto";
 import { OrderDetailDto } from "../../dtos/orders/orderDetail.dto";
-import { AuthRepository } from "../../repositories/auth.repository";
 import { OrderRepository } from "../../repositories/order.repository";
 
 interface Order {
+    id: number;
+    user_id: number;
     tracking_code: string;
     package_weight: number;
     package_dimensions: string;
@@ -15,25 +15,23 @@ interface Order {
     recipient_identification: string;
     destination_address: string;
     status: string;
-    user_name: string;
-    user_phone: string;
-    user_identification: string;
-    transporter_name?: string;
-    transporter_identification?: string;
+    transporter_id?: number;
     assigned_at?: Date;
     delivery_at?: Date;
 }
 
-interface OrderDetailUseCase {
+interface CloseOrderUseCase {
     execute(orderDetailDto: OrderDetailDto): Promise<Order>;
 }
 
-export class OrderDetail implements OrderDetailUseCase {
+export class CloseOrder implements CloseOrderUseCase {
     constructor(private readonly orderRepository: OrderRepository) {}
 
     async execute(orderDetailDto: OrderDetailDto): Promise<Order> {
-        const order = await this.orderRepository.getOrderDetail(orderDetailDto);
+        const order = await this.orderRepository.closeOrder(orderDetailDto);
         return {
+            id: order.id,
+            user_id: order.user_id,
             tracking_code: order.tracking_code,
             package_weight: order.package_weight,
             package_dimensions: order.package_dimensions,
@@ -44,11 +42,7 @@ export class OrderDetail implements OrderDetailUseCase {
             recipient_identification: order.recipient_identification,
             destination_address: order.destination_address,
             status: order.status,
-            user_name: order.user_name,
-            user_phone: order.user_phone,
-            user_identification: order.user_identification,
-            transporter_name: order.transporter_name,
-            transporter_identification: order.transporter_identification,
+            transporter_id: order.transporter_id,
             assigned_at: order.assigned_at,
             delivery_at: order.delivery_at,
         };
