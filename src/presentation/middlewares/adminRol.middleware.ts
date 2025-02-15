@@ -12,7 +12,7 @@ export class ValidateAdminRolMiddleware {
             if (role !== "admin") {
                 res.status(403).json({
                     success: false,
-                    error: "Forbidden: Insufficient permissions",
+                    message: "Forbidden: Insufficient permissions",
                 });
                 return;
             }
@@ -21,7 +21,7 @@ export class ValidateAdminRolMiddleware {
             console.error(error);
             res.status(500).json({
                 success: false,
-                error: "Internal server error",
+                message: "Internal server error",
             });
         }
     };

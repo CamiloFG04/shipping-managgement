@@ -25,7 +25,7 @@ export class OrderMiddleware {
                 if (order.rowCount == 0) {
                     res.status(404).json({
                         success: false,
-                        error: "Order not found",
+                        message: "Order not found",
                     });
                     return;
                 }
@@ -33,7 +33,8 @@ export class OrderMiddleware {
                 if (order.rows[0].status === "Delivered") {
                     res.status(409).json({
                         success: false,
-                        error: "This order has already been delivered and cannot be updated",
+                        message:
+                            "This order has already been delivered and cannot be updated",
                     });
                     return;
                 }
@@ -41,7 +42,8 @@ export class OrderMiddleware {
                 if (order.rows[0].transporter_id !== null) {
                     res.status(409).json({
                         success: false,
-                        error: "This order already has a transporter assigned",
+                        message:
+                            "This order already has a transporter assigned",
                     });
                     return;
                 }
@@ -51,7 +53,7 @@ export class OrderMiddleware {
             } catch (error) {
                 res.status(500).json({
                     success: false,
-                    error: "Internal server error",
+                    message: "Internal server error",
                 });
                 return;
             }
@@ -71,7 +73,7 @@ export class OrderMiddleware {
                 if (order.rowCount == 0) {
                     res.status(404).json({
                         success: false,
-                        error: "The consulted guide was not found",
+                        message: "The consulted guide was not found",
                     });
                     return;
                 }
@@ -83,7 +85,7 @@ export class OrderMiddleware {
 
                 res.status(500).json({
                     success: false,
-                    error: "Internal server error",
+                    message: "Internal server error",
                 });
                 return;
             }
@@ -103,7 +105,7 @@ export class OrderMiddleware {
                 if (order.rowCount == 0) {
                     res.status(404).json({
                         success: false,
-                        error: "The consulted guide was not found",
+                        message: "The consulted guide was not found",
                     });
                     return;
                 }
@@ -111,7 +113,8 @@ export class OrderMiddleware {
                 if (order.rows[0].status === "On hold") {
                     res.status(409).json({
                         success: false,
-                        error: "You are not allowed to close an order that is on hold",
+                        message:
+                            "You are not allowed to close an order that is on hold",
                     });
                     return;
                 }
@@ -123,7 +126,7 @@ export class OrderMiddleware {
 
                 res.status(500).json({
                     success: false,
-                    error: "Internal server error",
+                    message: "Internal server error",
                 });
                 return;
             }

@@ -22,14 +22,17 @@ export class AuthMiddleware {
         async (req: Request, res: Response, next: NextFunction) => {
             const authorization = req.header("Authorization");
             if (!authorization) {
-                res.status(401).json({ success: false, error: "Unauthorized" });
+                res.status(401).json({
+                    success: false,
+                    message: "Unauthorized",
+                });
                 return;
             }
 
             if (!authorization.startsWith("Bearer ")) {
                 res.status(401).json({
                     success: false,
-                    error: "Invalid Bearer token",
+                    message: "Invalid Bearer token",
                 });
                 return;
             }
@@ -41,7 +44,7 @@ export class AuthMiddleware {
                 if (!payload) {
                     res.status(401).json({
                         success: false,
-                        error: "Invalid token",
+                        message: "Invalid token",
                     });
                     return;
                 }
@@ -52,7 +55,7 @@ export class AuthMiddleware {
                 if (user.rowCount == 0) {
                     res.status(401).json({
                         success: false,
-                        error: "Invalid token - user not found",
+                        message: "Invalid token - user not found",
                     });
                     return;
                 }
@@ -62,7 +65,7 @@ export class AuthMiddleware {
             } catch (error) {
                 res.status(500).json({
                     success: false,
-                    error: "Internal server error",
+                    message: "Internal server error",
                 });
                 return;
             }

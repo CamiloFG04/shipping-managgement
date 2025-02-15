@@ -13,26 +13,30 @@ export class AutController {
         if (error instanceof CustomError) {
             res.status(error.statusCode).json({
                 success: false,
-                error: error.message,
+                message: error.message,
             });
         }
         console.log(error);
         return res
             .status(500)
-            .json({ success: false, error: "Internal server error" });
+            .json({ success: false, message: "Internal server error" });
     };
 
     registerUser = (req: Request, res: Response) => {
         const [error, registerDto] = RegisterDto.create(req.body);
         if (error) {
-            res.status(400).json({ success: false, error });
+            res.status(400).json({ success: false, message: error });
             return;
         }
 
         new RegisterUser(this.authRepository)
             .execute(registerDto)
             .then((user) => {
-                res.status(201).json({ success: true, user });
+                res.status(201).json({
+                    success: true,
+                    user,
+                    message: "Successfully registered user",
+                });
             })
             .catch((error) => this.handleError(error, res));
     };
@@ -40,14 +44,14 @@ export class AutController {
     loginUser = (req: Request, res: Response) => {
         const [error, loginDto] = LoginDto.create(req.body);
         if (error) {
-            res.status(400).json({ success: false, error });
+            res.status(400).json({ success: false, message: error });
             return;
         }
 
         new LoginUser(this.authRepository)
             .execute(loginDto)
             .then((token) => {
-                res.status(201).json({ success: true, token });
+                res.status(200).json({ success: true, token });
             })
             .catch((error) => this.handleError(error, res));
     };

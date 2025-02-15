@@ -18,27 +18,31 @@ export class OrderController {
         if (error instanceof CustomError) {
             res.status(error.statusCode).json({
                 success: false,
-                error: error.message,
+                message: error.message,
             });
         }
         console.log(error);
         return res
             .status(500)
-            .json({ success: false, error: "Internal server error" });
+            .json({ success: false, message: "Internal server error" });
     };
 
     store = (req: Request, res: Response) => {
         req.body.user_id = req.user.id;
         const [error, orderDto] = OrderDto.create(req.body);
         if (error) {
-            res.status(400).json({ success: false, error });
+            res.status(400).json({ success: false, message: error });
             return;
         }
 
         new CreateOrder(this.orderRepository)
             .execute(orderDto)
             .then((order) => {
-                res.status(201).json({ success: true, order });
+                res.status(201).json({
+                    success: true,
+                    order,
+                    message: "Order created successfully",
+                });
             })
             .catch((error) => this.handleError(error, res));
     };
@@ -48,14 +52,18 @@ export class OrderController {
         req.body.id = parseInt(id, 10);
         const [error, orderAssignDto] = OrderAssignDto.create(req.body);
         if (error) {
-            res.status(400).json({ success: false, error });
+            res.status(400).json({ success: false, message: error });
             return;
         }
 
         new AssignOrder(this.orderRepository)
             .execute(orderAssignDto)
             .then((order) => {
-                res.status(200).json({ success: true, order });
+                res.status(200).json({
+                    success: true,
+                    order,
+                    message: "Order assigned successfully",
+                });
             })
             .catch((error) => this.handleError(error, res));
     };
@@ -68,7 +76,7 @@ export class OrderController {
         });
 
         if (error) {
-            res.status(400).json({ success: false, error });
+            res.status(400).json({ success: false, message: error });
             return;
         }
 
@@ -83,14 +91,18 @@ export class OrderController {
     closeOrder = (req: Request, res: Response) => {
         const [error, orderAssignDto] = OrderDetailDto.create(req.params);
         if (error) {
-            res.status(400).json({ success: false, error });
+            res.status(400).json({ success: false, message: error });
             return;
         }
 
         new CloseOrder(this.orderRepository)
             .execute(orderAssignDto)
             .then((order) => {
-                res.status(200).json({ success: true, order });
+                res.status(200).json({
+                    success: true,
+                    order,
+                    message: "Order delivered",
+                });
             })
             .catch((error) => this.handleError(error, res));
     };
@@ -99,7 +111,7 @@ export class OrderController {
         const [error, ordersDto] = OrdersDto.create(req.query);
 
         if (error) {
-            res.status(400).json({ success: false, error });
+            res.status(400).json({ success: false, message: error });
             return;
         }
 

@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import { RedisAdapter } from "../config/redis";
+import { setupSwagger } from "../swaggerConfig";
 
 interface Options {
     port?: number;
@@ -19,6 +20,7 @@ export class Server {
 
     async start() {
         await RedisAdapter.connect();
+        setupSwagger(this.app);
         this.app.use(express.json());
         this.app.use(this.routes);
         this.app.listen(this.port, () => {

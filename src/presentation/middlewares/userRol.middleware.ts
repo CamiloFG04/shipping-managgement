@@ -12,7 +12,7 @@ export class ValidateUserRolMiddleware {
             if (role !== "user") {
                 res.status(403).json({
                     success: false,
-                    error: "Forbidden: only users can perform this action",
+                    message: "Forbidden: only users can perform this action",
                 });
                 return;
             }
@@ -21,7 +21,7 @@ export class ValidateUserRolMiddleware {
             console.error(error);
             res.status(500).json({
                 success: false,
-                error: "Internal server error",
+                message: "Internal server error",
             });
         }
     };

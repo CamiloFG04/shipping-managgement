@@ -15,7 +15,7 @@ export class TransporterMiddleware {
                 if (transporter.rowCount == 0) {
                     res.status(404).json({
                         success: false,
-                        error: "Transporter not found",
+                        message: "Transporter not found",
                     });
                     return;
                 }
@@ -23,7 +23,7 @@ export class TransporterMiddleware {
                 if (!transporter.rows[0].available) {
                     res.status(409).json({
                         success: false,
-                        error: "Transporter is not available",
+                        message: "Transporter is not available",
                     });
                     return;
                 }
@@ -32,7 +32,7 @@ export class TransporterMiddleware {
             } catch (error) {
                 res.status(500).json({
                     success: false,
-                    error: "Internal server error",
+                    message: "Internal server error",
                 });
                 return;
             }

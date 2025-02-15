@@ -29,7 +29,7 @@ export class validateAddressesMiddleware {
             if (originResponse.data.status !== "OK") {
                 res.status(400).json({
                     success: false,
-                    error: "Invalid origin address",
+                    message: "Invalid origin address",
                 });
                 return;
             }
@@ -37,7 +37,7 @@ export class validateAddressesMiddleware {
             if (destinationResponse.data.status !== "OK") {
                 res.status(400).json({
                     success: false,
-                    error: "Invalid destination address",
+                    message: "Invalid destination address",
                 });
                 return;
             }
@@ -47,7 +47,7 @@ export class validateAddressesMiddleware {
             console.error(error);
             res.status(500).json({
                 success: false,
-                error: "Error validating addresses",
+                message: "Error validating addresses",
             });
         }
     };

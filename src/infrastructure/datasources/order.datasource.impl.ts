@@ -54,8 +54,6 @@ export class OrderDataSourceImpl implements OrderDataSource {
 
             return OrderMapper.orderEntityFromObject(order.rows[0]);
         } catch (error) {
-            console.log({ error });
-
             if (error instanceof CustomError) {
                 throw error;
             }
