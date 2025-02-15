@@ -1,6 +1,4 @@
-import { RegisterDto } from "../../dtos/auth/register.dto";
 import { OrderDto } from "../../dtos/orders/order.dto";
-import { AuthRepository } from "../../repositories/auth.repository";
 import { OrderRepository } from "../../repositories/order.repository";
 
 interface Order {

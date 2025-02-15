@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Pool } from "pg";
 import { OrderEntity } from "../../domain/entities/order.entity";
-import { RedisAdapter } from "../../config/redis";
 
 declare global {
     namespace Express {

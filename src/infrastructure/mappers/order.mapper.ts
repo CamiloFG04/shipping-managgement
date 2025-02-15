@@ -1,5 +1,6 @@
 import { OrderEntity } from "../../domain/entities/order.entity";
 import { OrderDetailEntity } from "../../domain/entities/orderDetail.entity";
+import { OrdersEntity } from "../../domain/entities/orders.entity";
 import { CustomError } from "../../domain/errors/custom.error";
 
 export class OrderMapper {
@@ -129,6 +130,24 @@ export class OrderMapper {
             transporter_identification,
             assigned_at,
             delivery_at
+        );
+    }
+
+    public static ordersEntityFromObject(rows: OrdersEntity[]): OrdersEntity[] {
+        return rows.map(
+            (row) =>
+                new OrdersEntity(
+                    row.id,
+                    row.tracking_number,
+                    row.status,
+                    row.pickup_date,
+                    row.delivery_date,
+                    row.pickup_hour,
+                    row.delivery_hour,
+                    row.transportist,
+                    row.delivery_time,
+                    row.avg_delivery_time
+                )
         );
     }
 }

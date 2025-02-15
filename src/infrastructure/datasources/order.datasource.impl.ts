@@ -9,6 +9,8 @@ import { OrderAssignDto } from "../../domain/dtos/orders/orderAssign.dto";
 import { OrderDetailDto } from "../../domain/dtos/orders/orderDetail.dto";
 import { OrderDetailEntity } from "../../domain/entities/orderDetail.entity";
 import { RedisAdapter } from "../../config/redis";
+import { OrdersDto } from "../../domain/dtos/orders/orders.dto";
+import { OrdersEntity } from "../../domain/entities/orders.entity";
 
 export class OrderDataSourceImpl implements OrderDataSource {
     constructor(private readonly pool: Pool) {}
@@ -164,6 +166,69 @@ export class OrderDataSourceImpl implements OrderDataSource {
             );
 
             return OrderMapper.orderEntityFromObject(order.rows[0]);
+        } catch (error) {
+            console.log({ error });
+
+            if (error instanceof CustomError) {
+                throw error;
+            }
+            throw CustomError.internalServerError();
+        }
+    }
+
+    async orders(ordersDto: OrdersDto): Promise<OrdersEntity[]> {
+        const {
+            startDate,
+            endDate,
+            status,
+            transporter,
+            limit = 10,
+        } = ordersDto;
+        try {
+            let query = `
+                SELECT 
+                    o.id, 
+                    o.tracking_code, 
+                    o.status, 
+                    TO_CHAR(o.assigned_at, 'YYYY-MM-DD') AS pickup_date, 
+                    TO_CHAR(o.delivery_at, 'YYYY-MM-DD') AS delivery_date,
+                    TO_CHAR(o.assigned_at, 'HH24:MI:SS') AS pickup_hour, 
+                    TO_CHAR(o.delivery_at, 'HH24:MI:SS') AS delivery_hour,
+                    t.name AS transportist,
+                    ROUND(EXTRACT(EPOCH FROM (o.delivery_at - o.assigned_at)) / 3600, 2) AS delivery_time,
+                     -- Subconsulta: Promedio de tiempo de entrega por transportista
+                    (SELECT ROUND(AVG(EXTRACT(EPOCH FROM (s.delivery_at - s.assigned_at)) / 3600), 2)
+                    FROM orders s
+                    WHERE s.transporter_id = o.transporter_id
+                    AND s.status = 'Delivered') AS avg_delivery_time
+                FROM orders o
+                    LEFT JOIN transporters t ON o.transporter_id = t.id
+                WHERE 1=1`;
+            let values = [];
+
+            if (startDate) {
+                values.push(startDate);
+                query += ` AND assigned_at >= $${values.length}`;
+            }
+
+            if (endDate) {
+                values.push(endDate);
+                query += ` AND delivery_at <= $${values.length}::timestamp`;
+            }
+
+            if (status) {
+                values.push(status);
+                query += ` AND status = $${values.length}`;
+            }
+
+            if (transporter) {
+                values.push(transporter);
+                query += ` AND transporter_id = $${values.length}`;
+            }
+
+            const orders = await this.pool.query(query, values);
+
+            return OrderMapper.ordersEntityFromObject(orders.rows);
         } catch (error) {
             console.log({ error });
 
