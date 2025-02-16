@@ -1,7 +1,7 @@
 # Reto: Gestión de Envíos y Rutas Logísticas
 
 ## Descripción del Proyecto
-Este proyecto es una API para gestionar el envío de paquetes, optimizar rutas de entrega y permitir a los clientes rastrear sus pedidos en tiempo real. La API maneja usuarios, pedidos, rutas y estados de envío, asegurando seguridad, eficiencia y escalabilidad.
+Este proyecto es una API para gestionar el envío de paquetes, optimizar rutas de entrega y permitir a los clientes rastrear sus pedidos. La API maneja usuarios, pedidos, rutas y estados de envío, asegurando seguridad, eficiencia y escalabilidad.
 
 ## Tecnologías Utilizadas
 - **Framework:** Express
@@ -39,7 +39,7 @@ Este proyecto es una API para gestionar el envío de paquetes, optimizar rutas d
     JWT_SECRET=
     GOOGLE_MAPS_KEY=
    ```
-4. Levanta Redis con Docker:
+4. Levanta Redis con Docker (EL proyecto puede correr sin tener redis):
    ```sh
    docker-compose up -d
    ```
